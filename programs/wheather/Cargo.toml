@@ -1,12 +1,12 @@
 [package]
-name = "wheather"
+name = "token_creation"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "wheather"
+name = "token_creation"
 
 [features]
 default = []
@@ -14,7 +14,21 @@ cpi = ["no-entrypoint"]
 no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
-idl-build = ["anchor-lang/idl-build"]
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
 anchor-lang = "0.30.1"
+anchor-spl = "0.30.1"
+solana-program = "1.16.0"
+spl-token = "3.5.0"
+spl-associated-token-account = "1.1.3"
+
+[dev-dependencies]
+solana-sdk = "1.16.0"
+
+[profile.release]
+opt-level = "z"        # Optimizes for size
+lto = true             # Enables link-time optimization
+codegen-units = 1      # Helps manage stack size
+panic = "abort"        # Required by Solana for no panics
+overflow-checks = true # Optional; useful for debugging overflow issues

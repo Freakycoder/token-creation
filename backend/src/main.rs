@@ -8,10 +8,10 @@ struct ApiResponse{
 }
 
 async fn hello() -> impl Responder{
-    let message = ApiResponse{
+    let message_response = ApiResponse{
         message : String::from("hello from server")
     };
-    HttpResponse::Ok().json(message)
+    return HttpResponse::Ok().json(message_response); //acts a return statement without a semicolon and return keyword
 }
 
 #[actix_web::main]
