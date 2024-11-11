@@ -39,9 +39,9 @@ pub fn mint_to(ctx: Context<MintToken>, amount: u64) -> Result<()> {
 
     if ctx.accounts.sender_ata.data_is_empty() {
         let cpi_account = Create {
-            payer: ctx.accounts.sender.to_account_info(),
+            payer: ctx.accounts.mint_authority.to_account_info(),
             associated_token: ctx.accounts.sender_ata.to_account_info(),
-            authority: ctx.accounts.sender.to_account_info(),
+            authority: ctx.accounts.mint_authority.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
             token_program: ctx.accounts.token_program.to_account_info(),
             system_program: ctx.accounts.system_program.to_account_info(),
@@ -53,6 +53,7 @@ pub fn mint_to(ctx: Context<MintToken>, amount: u64) -> Result<()> {
         );
         create(cpi_context)?;
     }
+
 
     let cpi_accounts = MintTo {
         mint: ctx.accounts.mint.to_account_info(),

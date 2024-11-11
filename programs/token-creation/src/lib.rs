@@ -7,14 +7,14 @@ use anchor_spl::token::{self, Token,Mint, TokenAccount};
 use anchor_spl::associated_token::AssociatedToken;
 
 
-declare_id!("7VmU1amtib9FcdQxdmv1DxKQ1HS5jfufUujTJrvg6mU6");
+declare_id!("Hcviukm2UTkfmESXqjdC1NDMAou5kpSecSCav737NAbN");
 
 #[program]
 pub mod token_creation {
     use super::*;
 
-    pub fn initialize(ctx: Context<InitializeMintContext>, decimals: u8) -> Result<()> {
-        instructions::initialize_mint(ctx, decimals)
+    pub fn initialize_mint(ctx: Context<InitializeMintContext>, decimals: u8) -> Result<()> {
+       Ok(())
     }
 
     pub fn mint_to(ctx: Context<MintToken>, amount: u64) -> Result<()> {
@@ -24,7 +24,31 @@ pub mod token_creation {
     pub fn transfer_token(ctx: Context<TransferToken>, amount: u64) -> Result<()> {
         instructions::transfer_token(ctx, amount)
     }
+
+    pub fn initialize_pool(ctx: Context<InitializePool>, decimals: u8, bump: u8) -> Result<()> {
+        instructions::initialize_pool(ctx, decimals, bump)
+    }
+
+    pub fn add_liquidity(ctx: Context<AddLiquidity>, amount_a: u64, amount_b: u64) -> Result<()> {
+        instructions::add_liquidity(ctx, amount_a, amount_b)
+    }
+
+    pub fn swap_tokens(ctx: Context<SwapTokens>, amount_in: u64) -> Result<()> {
+        instructions::swap_tokens(ctx, amount_in)
+    }
+
+    pub fn withdraw_liquidity(
+        ctx: Context<WithdrawLiquidity>,
+        lp_tokens_to_redeem: u64,
+        min_token_a: u64,
+        min_token_b: u64,
+    ) -> Result<()> {
+        instructions::withdraw_liquidity(ctx, lp_tokens_to_redeem, min_token_a, min_token_b)
+    }
 }
+#[derive(Accounts)]
+pub struct Initialize{}
+
 
 #[derive(Accounts)]
 #[instruction(decimals: u8)]
@@ -32,17 +56,17 @@ pub struct InitializeMintContext<'info> {
     #[account(
         init,
         payer = authority,
-        space = 82,
-        owner = token::ID,
+        mint::decimals = decimals,         
+        mint::authority = authority.key(),                   
     )]
-    pub mint: Account<'info, Mint>,
+    pub mint: Account<'info, token::Mint>,
     
     #[account(mut)]
     pub authority: Signer<'info>,
     
     pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, token::Token>,
     pub rent: Sysvar<'info, Rent>,
-    pub token_program: Program<'info, Token>,
 }
 
 #[derive(Accounts)]
@@ -80,14 +104,10 @@ pub struct MintToken<'info> {
         constraint = mint.mint_authority.unwrap() == mint_authority.key()
     )]
     pub mint: Account<'info, Mint>,
-    
-    #[account(mut)]
-    pub sender: Signer<'info>,
-    
     #[account(mut)]
     ///CHECK : we'll create a account manually if it doesn't exist.
     pub sender_ata: AccountInfo<'info>,
-    
+    #[account(mut)]
     pub mint_authority: Signer<'info>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Program<'info, Token>,
@@ -121,7 +141,7 @@ pub struct InitializePool<'info>{
         init,
         payer = payer,
         space = 8 + 32,
-        seeds = [b"pool_authority"], 
+        seeds = [b"pool_authority".as_ref()], 
         bump, 
     )]
     pub pool_authority: Account<'info, PoolAuthority>,

@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-wheather = "7VmU1amtib9FcdQxdmv1DxKQ1HS5jfufUujTJrvg6mU6"
+token-creation = "Hcviukm2UTkfmESXqjdC1NDMAou5kpSecSCav737NAbN"
 
 [registry]
 url = "https://api.apr.dev"
